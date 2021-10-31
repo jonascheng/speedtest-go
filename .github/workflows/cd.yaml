@@ -16,5 +16,7 @@ jobs:
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
+      - uses: ahmadnassri/action-workflow-run-wait@v1
+      # only runs additional steps if [ go-ci ] was successful
       - name: build & push docker image
         run: make docker-push
