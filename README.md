@@ -1,27 +1,8 @@
 # speedtest-go
-**Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**  
-You can speedtest 2x faster than [speedtest.net](http://www.speedtest.net/) with almost the same result. [See the experimental results.](https://github.com/showwin/speedtest-go#summary-of-experimental-results).
+**Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**
+You can speedtest 2x faster than [speedtest.net](http://www.speedtest.net/) with almost the same result. [See the experimental results.](https://github.com/jonascheng/speedtest-go#summary-of-experimental-results).
 
 Inspired by [sivel/speedtest-cli](https://github.com/sivel/speedtest-cli)
-
-Go API Installation below.
-
-## CLI
-### Installation
-#### macOS (homebrew)
-
-```bash
-$ brew tap showwin/speedtest
-$ brew install speedtest
-
-### How to Update ###
-$ brew update
-$ brew upgrade speedtest
-```
-
-#### Other Platform (Linux, Windows, etc.)
-Please download compatible package from [Releases](https://github.com/showwin/speedtest-go/releases).  
-If there are no compatible package you want, please let me know on [issue](https://github.com/showwin/speedtest-go/issues).
 
 ### Usage
 
@@ -106,13 +87,13 @@ The memory usage can be reduced to 1/10, about 10MB of memory is used.
 However, please be careful that the accuracy is particularly low especially in an environment of 30 Mbps or higher.
 To get more accurate results, run multiple times and average.
 
-For more details, please see [saving mode experimental result](https://github.com/showwin/speedtest-go/blob/master/docs/saving_mode_experimental_result.md).
+For more details, please see [saving mode experimental result](https://github.com/jonascheng/speedtest-go/blob/master/docs/saving_mode_experimental_result.md).
 
 
 ## Go API
 
 ```
-go get github.com/showwin/speedtest-go
+go get github.com/jonascheng/speedtest-go
 ```
 
 ### API Usage
@@ -122,7 +103,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/showwin/speedtest-go/speedtest"
+	"github.com/jonascheng/speedtest-go/speedtest"
 )
 
 func main() {
@@ -147,7 +128,7 @@ Speedtest-go is a great tool because of following 2 reasons:
 * Testing time is the **SHORTEST** compare to [speedtest.net](http://www.speedtest.net/) and [sivel/speedtest-cli](https://github.com/sivel/speedtest-cli), especially about 2x faster then [speedtest.net](http://www.speedtest.net/).
 * Result is **MORE CLOSE** to [speedtest.net](http://www.speedtest.net/) than [speedtest-cli](https://github.com/sivel/speedtest-cli).
 
-Following data is summarized. If you got interested in, please see [more details](https://github.com/showwin/speedtest-go/blob/master/docs/experimental_result.md).
+Following data is summarized. If you got interested in, please see [more details](https://github.com/jonascheng/speedtest-go/blob/master/docs/experimental_result.md).
 
 ### Download (Mbps)
 distance = distance to testing server
@@ -186,4 +167,4 @@ distance = distance to testing server
 
 ## LICENSE
 
-[MIT](https://github.com/showwin/speedtest-go/blob/master/LICENSE)
+[MIT](https://github.com/jonascheng/speedtest-go/blob/master/LICENSE)
