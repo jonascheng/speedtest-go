@@ -21,7 +21,7 @@ run: setup ## runs go run the application
 
 .PHONY: test
 test: ## runs go test the application
-	go test -v ./...
+	go test -v ./... -covermode=count -coverprofile=coverage.out
 
 .PHONY: build
 build: clean ## build the application
