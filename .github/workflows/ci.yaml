@@ -40,7 +40,7 @@ jobs:
         uses: jandelgado/gcov2lcov-action@v1.0.8
       - name: cat coverage.lcov
         uses: pCYSl5EDgo/cat@master
-        id: coverage.lcov
+        id: coverage
         with:
           path: coverage.lcov
       - name: coveralls
