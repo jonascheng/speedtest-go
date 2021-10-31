@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jonascheng/speedtest-go/speedtest"
+	// A Go (golang) command line and flag parser
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -25,7 +26,7 @@ type fullOutput struct {
 type outputTime time.Time
 
 func main() {
-	kingpin.Version("1.1.4")
+	kingpin.Version("1.0.0")
 	kingpin.Parse()
 
 	user, err := speedtest.FetchUserInfo()
@@ -49,12 +50,14 @@ func main() {
 	startTest(targets, *savingMode, *jsonOutput)
 
 	if *jsonOutput {
-		jsonBytes, err := json.Marshal(
+		jsonBytes, err := json.MarshalIndent(
 			fullOutput{
 				Timestamp: outputTime(time.Now()),
 				UserInfo:  user,
 				Servers:   targets,
 			},
+			"",
+			"  ",
 		)
 		checkError(err)
 
