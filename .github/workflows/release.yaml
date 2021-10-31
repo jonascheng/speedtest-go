@@ -1,4 +1,4 @@
-name: go-ci
+name: release docker image
 
 on: [push]
 
