@@ -43,6 +43,17 @@ jobs:
         id: coverage
         with:
           path: coverage.out
+      - run: echo $TEXT
+        env:
+          TEXT: ${{ steps.coverage.outputs.text }}
+      - name: cat coverage.lcov
+        uses: pCYSl5EDgo/cat@master
+        id: lcov
+        with:
+          path: coverage.lcov
+      - run: echo $TEXT
+        env:
+          TEXT: ${{ steps.lcov.outputs.text }}
       - name: coveralls
         uses: coverallsapp/github-action@v1.1.2
         with:
