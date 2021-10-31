@@ -38,15 +38,15 @@ jobs:
         run: make test
       - name: convert coverage.out to coverage.lcov
         uses: jandelgado/gcov2lcov-action@v1.0.8
-      - name: cat coverage.lcov
+      - name: cat coverage.out
         uses: pCYSl5EDgo/cat@master
         id: coverage
         with:
-          path: coverage.lcov
+          path: coverage.out
       - name: coveralls
         uses: coverallsapp/github-action@v1.1.2
         with:
-          github-token: ${{ secrets.github_token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
 
   lint:
