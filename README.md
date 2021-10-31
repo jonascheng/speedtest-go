@@ -1,6 +1,5 @@
-![Build](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yml/badge.svg)
-![Lint](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yml/badge.svg)
-![Docker Hub](https://github.com/jonascheng/speedtest-go/actions/workflows/release.yml/badge.svg)
+![CI](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yaml/badge.svg)
+![CD](https://github.com/jonascheng/speedtest-go/actions/workflows/cd.yaml/badge.svg)
 
 # speedtest-go
 **Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**
