@@ -125,7 +125,6 @@ func main() {
 }
 ```
 
-
 ## Summary of Experimental Results
 Speedtest-go is a great tool because of following 2 reasons:
 * Testing time is the **SHORTEST** compare to [speedtest.net](http://www.speedtest.net/) and [sivel/speedtest-cli](https://github.com/sivel/speedtest-cli), especially about 2x faster then [speedtest.net](http://www.speedtest.net/).
@@ -148,7 +147,6 @@ distance = distance to testing server
 
 ### Upload (Mbps)
 
-
 | distance (km) | speedtest.net | speedtest-go | speedtest-cli |
 | :-- | :--: | :--: | :--: |
 | 0 - 1000 | 65.56 | **47.58** | 36.16 |
@@ -157,16 +155,11 @@ distance = distance to testing server
 
 ### Testing Time (sec)
 
-
 | distance (km) | speedtest.net | speedtest-go | speedtest-cli |
 | :-- | :--: | :--: | :--: |
 | 0 - 1000 | 45.03 | **22.84** | 24.46 |
 | 1000 - 8000 | 44.89 | **24.45** | 28.52 |
 | 8000 - 20000 | 49.64 | **34.08** | 41.26 |
-
-## Contributors
-* [kogai](https://github.com/kogai)
-* [cbergoon](https://github.com/cbergoon)
 
 ## LICENSE
 
