@@ -1,3 +1,7 @@
+![Build](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yml/badge.svg)
+![Lint](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yml/badge.svg)
+![Docker Hub](https://github.com/jonascheng/speedtest-go/actions/workflows/release.yml/badge.svg)
+
 # speedtest-go
 **Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**
 You can speedtest 2x faster than [speedtest.net](http://www.speedtest.net/) with almost the same result. [See the experimental results.](https://github.com/jonascheng/speedtest-go#summary-of-experimental-results).
