@@ -46,7 +46,7 @@ docker-build-release: clean ## build docker image without cache (slower than mak
 	${DOCKER} build --pull --no-cache -t ${REGISTRY}/${APPLICATION}:${COMMIT_SHA} .
 
 .PHONY: docker-push
-docker-push: docker-build ## push the docker image to registry
+docker-push: docker-build-release docker-login ## push the docker image to registry
 	${DOCKER} push ${REGISTRY}/${APPLICATION}:${COMMIT_SHA}
 
 .PHONY: help

@@ -50,7 +50,10 @@ jobs:
   release:
     needs: setup
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
-      - name: build docker image
-        run: make docker-build-release
+      - name: build & push docker image
+        run: make docker-push
