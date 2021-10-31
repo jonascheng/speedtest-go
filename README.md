@@ -1,6 +1,6 @@
 ![CI](https://github.com/jonascheng/speedtest-go/actions/workflows/ci.yaml/badge.svg)
 ![CD](https://github.com/jonascheng/speedtest-go/actions/workflows/cd.yaml/badge.svg)
-![codecov](https://codecov.io/gh/jonascheng/speedtest-go/branch/main/graph/badge.svg)]
+![codecov](https://codecov.io/gh/jonascheng/speedtest-go/branch/main/graph/badge.svg)
 
 # speedtest-go
 **Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**
