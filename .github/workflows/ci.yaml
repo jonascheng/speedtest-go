@@ -36,29 +36,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: test
         run: make test
-      - name: convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.8
-      - name: cat coverage.out
-        uses: pCYSl5EDgo/cat@master
-        id: coverage
+      - name: upload coverage report to CodeCov
+        uses: codecov/codecov-action@v2
         with:
-          path: coverage.out
-      - run: echo $TEXT
-        env:
-          TEXT: ${{ steps.coverage.outputs.text }}
-      - name: cat coverage.lcov
-        uses: pCYSl5EDgo/cat@master
-        id: lcov
-        with:
-          path: coverage.lcov
-      - run: echo $TEXT
-        env:
-          TEXT: ${{ steps.lcov.outputs.text }}
-      - name: coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.lcov
+          files: ./coverage.out
+          verbose: true
 
   lint:
     needs: setup
