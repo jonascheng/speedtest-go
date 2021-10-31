@@ -20,7 +20,7 @@ run: setup ## runs go run the application
 	go run -race speedtest.go
 
 .PHONY: test
-test: setup ## runs go test the application
+test: ## runs go test the application
 	go test -v ./...
 
 .PHONY: build
