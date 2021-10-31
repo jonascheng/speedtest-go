@@ -55,7 +55,7 @@ jobs:
         env:
           TEXT: ${{ steps.lcov.outputs.text }}
       - name: coveralls
-        uses: coverallsapp/github-action@v1.1.2
+        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
