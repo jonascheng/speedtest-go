@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: build
-        run: go build ./...
+        run: make build
 
   test:
     needs: setup
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: test
-        run: go test ./speedtest -v
+        run: make test
 
   lint:
     needs: setup
