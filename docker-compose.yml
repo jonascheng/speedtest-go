@@ -1,0 +1,14 @@
+---
+version: "3.7"
+
+services:
+
+  ookla:
+    build:
+      context: ./ookla/ookla-for-docker
+      dockerfile: Dockerfile
+    image: local/ookla
+    container_name: ookla
+    restart: on-failure
+    ports:
+    - 0.0.0.0:8080:8080
