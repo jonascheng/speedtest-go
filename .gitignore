@@ -28,4 +28,5 @@ speedtest-go
 
 .idea/
 
+bin/**
 coverage.out
