@@ -21,11 +21,9 @@ var (
 )
 
 type fullOutput struct {
-	Timestamp outputTime        `json:"timestamp"`
 	UserInfo  *speedtest.User   `json:"user_info"`
 	Servers   speedtest.Servers `json:"servers"`
 }
-type outputTime time.Time
 
 func main() {
 	kingpin.Version("1.0.0")
@@ -66,7 +64,6 @@ func main() {
 	if *jsonOutput {
 		jsonBytes, err := json.MarshalIndent(
 			fullOutput{
-				Timestamp: outputTime(time.Now()),
 				UserInfo:  user,
 				Servers:   targets,
 			},
