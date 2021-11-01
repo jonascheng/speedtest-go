@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-resty/resty/v2"
+
 	"github.com/jonascheng/speedtest-go/speedtest"
 	// A Go (golang) command line and flag parser
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -29,7 +31,19 @@ func main() {
 	kingpin.Version("1.0.0")
 	kingpin.Parse()
 
-	user, err := speedtest.FetchUserInfo()
+	// Create a Resty Client
+	client := resty.New()
+	client.
+		// Set retry count to non zero to enable retries
+		SetRetryCount(3).
+		// You can override initial retry wait time.
+		// Default is 100 milliseconds.
+		SetRetryWaitTime(5 * time.Second).
+		// MaxWaitTime can be overridden as well.
+		// Default is 2 seconds.
+		SetRetryMaxWaitTime(20 * time.Second)
+
+	user, err := speedtest.FetchUserInfo(client)
 	if err != nil {
 		fmt.Println("Warning: Cannot fetch user information. http://www.speedtest.net/speedtest-config.php is temporarily unavailable.")
 	}
