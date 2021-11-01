@@ -12,10 +12,12 @@ const speedTestConfigUrl = "https://www.speedtest.net/speedtest-config.php"
 
 // User represents information determined about the caller by speedtest.net
 type User struct {
-	IP  string `xml:"ip,attr"`
-	Lat string `xml:"lat,attr"`
-	Lon string `xml:"lon,attr"`
-	Isp string `xml:"isp,attr"`
+	// <client ip="211.72.129.103" lat="25.0504" lon="121.5324" isp="Chunghwa Telecom" country="TW"/>
+	IP      string `xml:"ip,attr"`
+	Lat     string `xml:"lat,attr"`
+	Lon     string `xml:"lon,attr"`
+	Isp     string `xml:"isp,attr"`
+	Country string `xml:"country,attr"`
 }
 
 // Users for decode xml
@@ -59,5 +61,5 @@ func FetchUserInfoContext(ctx context.Context) (*User, error) {
 
 // String representation of User
 func (u *User) String() string {
-	return fmt.Sprintf("%s, (%s) [%s, %s]", u.IP, u.Isp, u.Lat, u.Lon)
+	return fmt.Sprintf("%s, (%s) (%s) [%s, %s]", u.IP, u.Isp, u.Country, u.Lat, u.Lon)
 }

@@ -28,11 +28,13 @@ Flags:
 Simply use `speedtest` command. The closest server is selected by default.
 
 ```bash
-$ speedtest
-Testing From IP: 124.27.199.165 (Fujitsu) [34.9769, 138.3831]
+$ ./bin/speedtest-go
+Testing From IP: 211.72.129.103, (Chunghwa Telecom) (TW) [25.0504, 121.5324]
 
-Target Server: [6691]     9.03km Shizuoka (Japan) by sudosan
-latency: 39.436061ms
+Target Server: [18445]     1.91km
+	> Taipei (Taiwan) by Chunghwa Mobile
+	> http://tp1.chtm.hinet.net:8080/speedtest/upload.php
+Latency: 7.523354ms
 Download Test: ................
 Upload Test: ................
 
@@ -45,42 +47,47 @@ Upload: 35.26 Mbit/s
 If you want to select other server to test, you can see available server list.
 
 ```bash
-$ speedtest --list
-Testing From IP: 124.27.199.165 (Fujitsu) [34.9769, 138.3831]
-[6691]     9.03km Shizuoka (Japan) by sudosan
-[6087]   120.55km Fussa-shi (Japan) by Allied Telesis Capital Corporation
-[6508]   125.44km Yokohama (Japan) by at2wn
-[6424]   148.23km Tokyo (Japan) by Cordeos Corp.
-[6492]   153.06km Sumida (Japan) by denpa893
-[7139]   192.63km Tsukuba (Japan) by SoftEther Corporation
-[6368]   194.83km Maibara (Japan) by gatolabo
-[6463]   220.39km Kusatsu (Japan) by j416dy
-[6766]   232.54km Nomi (Japan) by JAIST(ino-lab)
-[6476]   265.10km Osaka (Japan) by rxy (individual)
-[6477]   268.94km Sakai (Japan) by satoweb
-...
+$ ./bin/speedtest-go --list
+Testing From IP: 211.72.129.103, (Chunghwa Telecom) (TW) [25.0504, 121.5324]
+[18445]     1.91km Taipei (Taiwan) by Chunghwa Mobile
+[2133]     1.91km Taipei (Taiwan) by Taiwan Fixed Network
+[44603]     1.91km Taipei (Taiwan) by Taiwan Digital Streaming Co.
+[45693]     1.91km Taipei (Taiwan) by PEGATRON
+[13506]     3.45km Taipei (Taiwan) by TAIFO Taiwan
+[14652]     3.85km 新北 (Taiwan) by 大新店
+[14651]     3.85km 新北 (Taiwan) by 新唐城
+[17265]     7.68km Zhonghe (TW) by FarEasTone Telecom
+[24461]     8.34km Banqiao (Taiwan) by Homeplus
 ```
 
 and select them by id.
 
 ```bash
-$ speedtest --server 6691 --server 6087
-Testing From IP: 124.27.199.165 (Fujitsu) [34.9769, 138.3831]
+$ ./bin/speedtest-go --server 18445 --server 24461
+Testing From IP: 211.72.129.103, (Chunghwa Telecom) (TW) [25.0504, 121.5324]
 
-Target Server: [6691]     9.03km Shizuoka (Japan) by sudosan
-Latency: 23.612861ms
+Target Server: [18445]     1.91km
+	> Taipei (Taiwan) by Chunghwa Mobile
+	> http://tp1.chtm.hinet.net:8080/speedtest/upload.php
+Latency: 8.655645ms
 Download Test: ................
 Upload Test: ........
 
-Target Server: [6087]   120.55km Fussa-shi (Japan) by Allied Telesis Capital Corporation
-Latency: 38.694699ms
-Download Test: ................
-Upload Test: ................
+Download: 126.69 Mbit/s
+Upload: 101.33 Mbit/s
 
-[6691] Download: 65.82 Mbit/s, Upload: 27.00 Mbit/s
-[6087] Download: 72.24 Mbit/s, Upload: 29.56 Mbit/s
-Download Avg: 69.03 Mbit/s
-Upload Avg: 28.28 Mbit/s
+Target Server: [24461]     8.34km
+	> Banqiao (Taiwan) by Homeplus
+	> http://sky-speedtest.bbtv.tw:8080/speedtest/upload.php
+Latency: 9.962729ms
+Download Test: ............................
+Upload Test: ...........
+
+Download: 113.40 Mbit/s
+Upload: 128.44 Mbit/s
+
+Download Avg: 120.04 Mbit/s
+Upload Avg: 114.88 Mbit/s
 ```
 
 ## Go API

@@ -152,8 +152,9 @@ func showServerList(serverList speedtest.ServerList) {
 
 func showServer(s *speedtest.Server) {
 	fmt.Printf(" \n")
-	fmt.Printf("Target Server: [%4s] %8.2fkm ", s.ID, s.Distance)
-	fmt.Printf(s.Name + " (" + s.Country + ") by " + s.Sponsor + "\n")
+	fmt.Printf("Target Server: [%4s] %8.2fkm\n", s.ID, s.Distance)
+	fmt.Printf("\t> " + s.Name + " (" + s.Country + ") by " + s.Sponsor + "\n")
+	fmt.Printf("\t> " + s.URL + "\n")
 }
 
 func showLatencyResult(server *speedtest.Server) {
@@ -187,9 +188,4 @@ func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func (t outputTime) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("2006-01-02 15:04:05.000"))
-	return []byte(stamp), nil
 }

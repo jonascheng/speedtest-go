@@ -18,7 +18,6 @@ func TestFetchUserInfo(t *testing.T) {
 	if strings.Count(user.IP, ".") != 3 {
 		t.Errorf("Invalid IP format. got: %v", user.IP)
 	}
-
 	// Lat
 	lat, err := strconv.ParseFloat(user.Lat, 64)
 	if err != nil {
@@ -27,7 +26,6 @@ func TestFetchUserInfo(t *testing.T) {
 	if lat < -90 || 90 < lat {
 		t.Errorf("Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
 	}
-
 	// Lon
 	lon, err := strconv.ParseFloat(user.Lon, 64)
 	if err != nil {
@@ -36,7 +34,6 @@ func TestFetchUserInfo(t *testing.T) {
 	if lon < -180 || 180 < lon {
 		t.Errorf("Invalid Latitude. got: %v, expected between -90 and 90", user.Lon)
 	}
-
 	// Isp
 	if len(user.Isp) == 0 {
 		t.Errorf("Invalid Iso. got: %v;", user.Isp)
