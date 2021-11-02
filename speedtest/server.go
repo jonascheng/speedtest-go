@@ -91,7 +91,7 @@ func FetchServerListContext(ctx context.Context, client *resty.Client, user *Use
 	sort.Sort(ByDistance{list.Servers})
 
 	if len(list.Servers) <= 0 {
-		return list, errors.New("unable to retrieve server list")
+		return ServerList{}, errors.New("unable to retrieve server list")
 	}
 
 	return list, nil

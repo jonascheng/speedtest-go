@@ -62,7 +62,32 @@ func TestFetchServerListWithFakeResponse(t *testing.T) {
 	assert.Equal(t, "fake.com:8080", serverList.Servers[0].Host)
 	d := distance(35.22, 138.44, 35.22, 138.44)
 	assert.Equal(t, d, serverList.Servers[0].Distance, "the distance should be the same")
+}
 
+func TestFetchServerListWithEmptyResponse(t *testing.T) {
+	defer httpmock.DeactivateAndReset()
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `<settings></settings>`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", speedTestServersUrl, fakeResponder(200, resp, "application/xml"))
+
+	user := User{
+		IP:      "111.111.111.111",
+		Lat:     "35.22",
+		Lon:     "138.44",
+		Isp:     "Hello",
+		Country: "US",
+	}
+	serverList, err := FetchServerList(client, &user)
+	assert.Error(t, err, "should expect error")
+	assert.Equal(t, "unable to retrieve server list", err.Error(), "unexpected error")
+	assert.Equal(t, ServerList{}, serverList)
 }
 
 func TestDistance(t *testing.T) {

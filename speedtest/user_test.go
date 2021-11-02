@@ -76,3 +76,22 @@ func TestFetchUserInfoWithFakeResponse(t *testing.T) {
 	assert.Equal(t, "Chunghwa Telecom", user.Isp)
 	assert.Equal(t, "TW", user.Country)
 }
+
+func TestFetchUserInfoWithEmptyResponse(t *testing.T) {
+	defer httpmock.DeactivateAndReset()
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `<settings></settings>`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", speedTestConfigUrl, fakeResponder(200, resp, "application/xml"))
+
+	user, err := FetchUserInfo(client)
+	assert.Error(t, err, "should expect error")
+	assert.Equal(t, "failed to fetch user information", err.Error(), "unexpected error")
+	assert.Nil(t, user)
+}
