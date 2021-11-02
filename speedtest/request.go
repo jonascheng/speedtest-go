@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -254,24 +255,22 @@ func uploadRequest(ctx context.Context, ulURL string, w int) error {
 }
 
 // PingTest executes test to measure latency
-func (s *Server) PingTest() error {
-	return s.PingTestContext(context.Background())
+func (s *Server) PingTest(client *resty.Client) error {
+	return s.PingTestContext(context.Background(), client)
 }
 
 // PingTestContext executes test to measure latency, observing the given context.
-func (s *Server) PingTestContext(ctx context.Context) error {
+func (s *Server) PingTestContext(ctx context.Context, client *resty.Client) error {
 	pingURL := strings.Split(s.URL, "/upload.php")[0] + "/latency.txt"
 
 	l := time.Duration(100000000000) // 10sec
 	for i := 0; i < 3; i++ {
 		sTime := time.Now()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, pingURL, nil)
-		if err != nil {
-			return err
-		}
+		_, err := client.R().
+			SetContext(ctx).
+			Get(pingURL)
 
-		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return err
 		}
@@ -280,10 +279,9 @@ func (s *Server) PingTestContext(ctx context.Context) error {
 		if fTime.Sub(sTime) < l {
 			l = fTime.Sub(sTime)
 		}
-
-		resp.Body.Close()
 	}
 
+	// divide by 2 due to round trip time per request
 	s.Latency = time.Duration(int64(l.Nanoseconds() / 2))
 
 	return nil

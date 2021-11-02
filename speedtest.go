@@ -21,8 +21,8 @@ var (
 )
 
 type fullOutput struct {
-	UserInfo  *speedtest.User   `json:"user_info"`
-	Servers   speedtest.Servers `json:"servers"`
+	UserInfo *speedtest.User   `json:"user_info"`
+	Servers  speedtest.Servers `json:"servers"`
 }
 
 func main() {
@@ -60,13 +60,13 @@ func main() {
 	targets, err := serverList.FindServer(*serverIds)
 	checkError(err)
 
-	startTest(targets, *savingMode, *jsonOutput)
+	startTest(client, targets, *savingMode, *jsonOutput)
 
 	if *jsonOutput {
 		jsonBytes, err := json.MarshalIndent(
 			fullOutput{
-				UserInfo:  user,
-				Servers:   targets,
+				UserInfo: user,
+				Servers:  targets,
 			},
 			"",
 			"  ",
@@ -77,13 +77,13 @@ func main() {
 	}
 }
 
-func startTest(servers speedtest.Servers, savingMode bool, jsonOutput bool) {
+func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool, jsonOutput bool) {
 	for _, s := range servers {
 		if !jsonOutput {
 			showServer(s)
 		}
 
-		err := s.PingTest()
+		err := s.PingTest(client)
 		checkError(err)
 
 		if jsonOutput {
