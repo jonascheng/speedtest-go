@@ -19,7 +19,7 @@ func TestFetchServerList(t *testing.T) {
 		Isp: "Hello",
 	}
 	serverList, err := FetchServerList(client, &user)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	assert.Greater(t, len(serverList.Servers), 0, "failed to fetch server list.")
 	assert.Greater(t, len(serverList.Servers[0].Country), 0, "got unexpected country name '%v'", serverList.Servers[0].Country)
 }
@@ -49,7 +49,7 @@ func TestFetchServerListWithFakeResponse(t *testing.T) {
 		Country: "US",
 	}
 	serverList, err := FetchServerList(client, &user)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	assert.Greater(t, len(serverList.Servers), 0, "failed to fetch server list.")
 	assert.Equal(t, "http://fake.com:8080/speedtest/upload.php", serverList.Servers[0].URL)
 	assert.Equal(t, "新北", serverList.Servers[0].Name)
@@ -83,7 +83,7 @@ func TestFetchServerListWithEmptyResponse(t *testing.T) {
 	}
 	serverList, err := FetchServerList(client, &user)
 	assert.Error(t, err, "should expect error")
-	assert.Equal(t, "unable to retrieve server list", err.Error(), "unexpected error")
+	assert.Equal(t, "unable to retrieve server list", err.Error(), "unexpected error %v", err)
 	assert.Equal(t, ServerList{}, serverList)
 }
 
@@ -106,13 +106,13 @@ func TestDistance(t *testing.T) {
 
 func TestFindServer(t *testing.T) {
 	servers := []*Server{
-		&Server{
+		{
 			ID: "1",
 		},
-		&Server{
+		{
 			ID: "2",
 		},
-		&Server{
+		{
 			ID: "3",
 		},
 	}
@@ -120,40 +120,20 @@ func TestFindServer(t *testing.T) {
 
 	serverID := []int{}
 	s, err := serverList.FindServer(serverID)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if len(s) != 1 {
-		t.Errorf("Unexpected server length. got: %v, expected: 1", len(s))
-	}
-	if s[0].ID != "1" {
-		t.Errorf("Unexpected server ID. got: %v, expected: '1'", s[0].ID)
-	}
+	assert.NoError(t, err, "unexpected error %v", err)
+	assert.Equal(t, 1, len(s), "unexpected server length. got: %v, expected: 1", len(s))
+	assert.Equal(t, "1", s[0].ID, "unexpected server ID. got: %v, expected: '1'", s[0].ID)
 
 	serverID = []int{2}
 	s, err = serverList.FindServer(serverID)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if len(s) != 1 {
-		t.Errorf("Unexpected server length. got: %v, expected: 1", len(s))
-	}
-	if s[0].ID != "2" {
-		t.Errorf("Unexpected server ID. got: %v, expected: '2'", s[0].ID)
-	}
+	assert.NoError(t, err, "unexpected error %v", err)
+	assert.Equal(t, 1, len(s), "unexpected server length. got: %v, expected: 1", len(s))
+	assert.Equal(t, "2", s[0].ID, "unexpected server ID. got: %v, expected: '2'", s[0].ID)
 
 	serverID = []int{3, 1}
 	s, err = serverList.FindServer(serverID)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if len(s) != 2 {
-		t.Errorf("Unexpected server length. got: %v, expected: 2", len(s))
-	}
-	if s[0].ID != "3" {
-		t.Errorf("Unexpected server ID. got: %v, expected: '3'", s[0].ID)
-	}
-	if s[1].ID != "1" {
-		t.Errorf("Unexpected server ID. got: %v, expected: '1'", s[0].ID)
-	}
+	assert.NoError(t, err, "unexpected error %v", err)
+	assert.Equal(t, 2, len(s), "unexpected server length. got: %v, expected: 2", len(s))
+	assert.Equal(t, "3", s[0].ID, "unexpected server ID. got: %v, expected: '3'", s[0].ID)
+	assert.Equal(t, "1", s[1].ID, "unexpected server ID. got: %v, expected: '1'", s[1].ID)
 }

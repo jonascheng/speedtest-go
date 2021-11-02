@@ -23,18 +23,18 @@ func TestFetchUserInfo(t *testing.T) {
 	client := resty.New()
 
 	user, err := FetchUserInfo(client)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	// IP
 	assert.NotNil(t, net.ParseIP(user.IP).To4(), "Invalid IP. got: %v", user.IP)
 	assert.Equal(t, 3, strings.Count(user.IP, "."), "Invalid IP format. got: %v", user.IP)
 	// Lat
 	lat, err := strconv.ParseFloat(user.Lat, 64)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	assert.GreaterOrEqual(t, lat, -90.0, "Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
 	assert.LessOrEqual(t, lat, 90.0, "Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
 	// Lon
 	lon, err := strconv.ParseFloat(user.Lon, 64)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	assert.GreaterOrEqual(t, lon, -180.0, "Invalid Longitude. got: %v, expected between -180 and 180", user.Lon)
 	assert.LessOrEqual(t, lon, 180.0, "Invalid Longitude. got: %v, expected between -180 and 180", user.Lon)
 	// Isp
@@ -69,7 +69,7 @@ func TestFetchUserInfoWithFakeResponse(t *testing.T) {
 	httpmock.RegisterResponder("GET", speedTestConfigUrl, fakeResponder(200, resp, "application/xml"))
 
 	user, err := FetchUserInfo(client)
-	assert.NoError(t, err, "unexpected error")
+	assert.NoError(t, err, "unexpected error %v", err)
 	assert.Equal(t, "211.72.129.103", user.IP)
 	assert.Equal(t, "25.0504", user.Lat)
 	assert.Equal(t, "121.5324", user.Lon)
@@ -92,6 +92,6 @@ func TestFetchUserInfoWithEmptyResponse(t *testing.T) {
 
 	user, err := FetchUserInfo(client)
 	assert.Error(t, err, "should expect error")
-	assert.Equal(t, "failed to fetch user information", err.Error(), "unexpected error")
+	assert.Equal(t, "failed to fetch user information", err.Error(), "unexpected error %v", err)
 	assert.Nil(t, user)
 }
