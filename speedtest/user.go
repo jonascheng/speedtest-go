@@ -48,6 +48,7 @@ func FetchUserInfoContext(ctx context.Context, client *resty.Client) (*User, err
 		return nil, errors.New("failed to fetch user information")
 	}
 
+	// Only return the first item
 	return &users.Users[0], nil
 }
 
