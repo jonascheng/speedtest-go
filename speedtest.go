@@ -16,7 +16,6 @@ import (
 var (
 	showList   = kingpin.Flag("list", "Show available speedtest.net servers.").Short('l').Bool()
 	serverIds  = kingpin.Flag("server", "Select server id to speedtest.").Short('s').Ints()
-	savingMode = kingpin.Flag("saving-mode", "Using less memory (≒10MB), though low accuracy (especially > 30Mbps).").Bool()
 	jsonOutput = kingpin.Flag("json", "Output results in json format").Bool()
 )
 
@@ -60,7 +59,7 @@ func main() {
 	targets, err := serverList.FindServer(*serverIds)
 	checkError(err)
 
-	startTest(client, targets, *savingMode, *jsonOutput)
+	startTest(client, targets, *jsonOutput)
 
 	if *jsonOutput {
 		jsonBytes, err := json.MarshalIndent(
@@ -77,7 +76,7 @@ func main() {
 	}
 }
 
-func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool, jsonOutput bool) {
+func startTest(client *resty.Client, servers speedtest.Servers, jsonOutput bool) {
 	for _, s := range servers {
 		if !jsonOutput {
 			showServer(s)
@@ -90,7 +89,7 @@ func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool,
 			err := s.DownloadTest(client)
 			checkError(err)
 
-			err = s.UploadTest(savingMode)
+			err = s.UploadTest(client)
 			checkError(err)
 
 			continue
@@ -100,7 +99,7 @@ func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool,
 
 		err = testDownload(s, client)
 		checkError(err)
-		err = testUpload(s, savingMode)
+		err = testUpload(s, client)
 		checkError(err)
 
 		showServerResult(s)
@@ -124,11 +123,11 @@ func testDownload(server *speedtest.Server, client *resty.Client) error {
 	return err
 }
 
-func testUpload(server *speedtest.Server, savingMode bool) error {
+func testUpload(server *speedtest.Server, client *resty.Client) error {
 	quit := make(chan bool)
 	fmt.Printf("Upload Test: ")
 	go dots(quit)
-	err := server.UploadTest(savingMode)
+	err := server.UploadTest(client)
 	quit <- true
 	if err != nil {
 		return err
