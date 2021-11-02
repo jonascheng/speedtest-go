@@ -25,20 +25,20 @@ func TestFetchUserInfo(t *testing.T) {
 	user, err := FetchUserInfo(client)
 	assert.NoError(t, err, "unexpected error")
 	// IP
-	assert.NotNil(t, net.ParseIP(user.IP).To4(), "Invalid IP. got: "+user.IP)
-	assert.Equal(t, 3, strings.Count(user.IP, "."), "Invalid IP format. got: "+user.IP)
+	assert.NotNil(t, net.ParseIP(user.IP).To4(), "Invalid IP. got: %v", user.IP)
+	assert.Equal(t, 3, strings.Count(user.IP, "."), "Invalid IP format. got: %v", user.IP)
 	// Lat
 	lat, err := strconv.ParseFloat(user.Lat, 64)
 	assert.NoError(t, err, "unexpected error")
-	assert.GreaterOrEqual(t, lat, -90.0, "Invalid Latitude. got: "+user.Lat+", expected between -90 and 90")
-	assert.LessOrEqual(t, lat, 90.0, "Invalid Latitude. got: "+user.Lat+", expected between -90 and 90")
+	assert.GreaterOrEqual(t, lat, -90.0, "Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
+	assert.LessOrEqual(t, lat, 90.0, "Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
 	// Lon
 	lon, err := strconv.ParseFloat(user.Lon, 64)
 	assert.NoError(t, err, "unexpected error")
-	assert.GreaterOrEqual(t, lon, -180.0, "Invalid Longitude. got: "+user.Lon+", expected between -180 and 180")
-	assert.LessOrEqual(t, lon, 180.0, "Invalid Longitude. got: "+user.Lon+", expected between -180 and 180")
+	assert.GreaterOrEqual(t, lon, -180.0, "Invalid Longitude. got: %v, expected between -180 and 180", user.Lon)
+	assert.LessOrEqual(t, lon, 180.0, "Invalid Longitude. got: %v, expected between -180 and 180", user.Lon)
 	// Isp
-	assert.Greater(t, len(user.Isp), 0, "Invalid Isp. got: "+user.Isp)
+	assert.Greater(t, len(user.Isp), 0, "Invalid Isp. got: %v", user.Isp)
 }
 
 func TestFetchUserInfoWithFakeResponse(t *testing.T) {

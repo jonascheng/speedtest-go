@@ -21,10 +21,7 @@ func TestFetchServerList(t *testing.T) {
 	serverList, err := FetchServerList(client, &user)
 	assert.NoError(t, err, "unexpected error")
 	assert.Greater(t, len(serverList.Servers), 0, "failed to fetch server list.")
-	assert.Greater(t, len(serverList.Servers[0].Country), 0, "got unexpected country name "+serverList.Servers[0].Country)
-	if len(serverList.Servers[0].Country) == 0 {
-		t.Errorf("got unexpected country name '%v'", serverList.Servers[0].Country)
-	}
+	assert.Greater(t, len(serverList.Servers[0].Country), 0, "got unexpected country name '%v'", serverList.Servers[0].Country)
 }
 
 func TestFetchServerListWithFakeResponse(t *testing.T) {
@@ -92,25 +89,19 @@ func TestFetchServerListWithEmptyResponse(t *testing.T) {
 
 func TestDistance(t *testing.T) {
 	d := distance(0.0, 0.0, 1.0, 1.0)
-	if d < 157 || 158 < d {
-		t.Errorf("got: %v, expected between 157 and 158", d)
-	}
+	assert.GreaterOrEqual(t, d, 157.0, "got: %v, expected between 157 and 158", d)
+	assert.LessOrEqual(t, d, 158.0, "got: %v, expected between 157 and 158", d)
 
 	d = distance(0.0, 180.0, 0.0, -180.0)
-	if d != 0 {
-		t.Errorf("got: %v, expected 0", d)
-	}
+	assert.Equal(t, d, 0.0, "got: %v, expected 0", d)
 
 	d1 := distance(100.0, 100.0, 100.0, 101.0)
 	d2 := distance(100.0, 100.0, 100.0, 99.0)
-	if d1 != d2 {
-		t.Errorf("%v and %v should be save value", d1, d2)
-	}
+	assert.Equal(t, d1, d2, "%v and %v should be save value", d1, d2)
 
 	d = distance(35.0, 140.0, -40.0, -140.0)
-	if d < 11000 || 12000 < d {
-		t.Errorf("got: %v, expected 0", d)
-	}
+	assert.GreaterOrEqual(t, d, 11000.0, "got: %v, expected between 11000 and 12000", d)
+	assert.LessOrEqual(t, d, 12000.0, "got: %v, expected between 11000 and 12000", d)
 }
 
 func TestFindServer(t *testing.T) {
