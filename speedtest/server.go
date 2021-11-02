@@ -2,18 +2,17 @@ package speedtest
 
 import (
 	"context"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"math"
-	"net/http"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
-const speedTestServersUrl = "https://www.speedtest.net/speedtest-servers-static.php"
-const speedTestServersAlternativeUrl = "https://www.speedtest.net/speedtest-servers-static.php"
+const speedTestServersUrl = "https://www2.speedtest.net/speedtest-servers-static.php"
 
 // Server information
 type Server struct {
@@ -61,44 +60,21 @@ func (b ByDistance) Less(i, j int) bool {
 }
 
 // FetchServerList retrieves a list of available servers
-func FetchServerList(user *User) (ServerList, error) {
-	return FetchServerListContext(context.Background(), user)
+func FetchServerList(client *resty.Client, user *User) (ServerList, error) {
+	return FetchServerListContext(context.Background(), client, user)
 }
 
 // FetchServerListContext retrieves a list of available servers, observing the given context.
-func FetchServerListContext(ctx context.Context, user *User) (ServerList, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, speedTestServersUrl, nil)
-	if err != nil {
-		return ServerList{}, err
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return ServerList{}, err
-	}
-
-	if resp.ContentLength == 0 {
-		resp.Body.Close()
-
-		req, err = http.NewRequestWithContext(ctx, http.MethodGet, speedTestServersAlternativeUrl, nil)
-		if err != nil {
-			return ServerList{}, err
-		}
-
-		resp, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return ServerList{}, err
-		}
-	}
-
-	defer resp.Body.Close()
-
-	// Decode xml
-	decoder := xml.NewDecoder(resp.Body)
-
+func FetchServerListContext(ctx context.Context, client *resty.Client, user *User) (ServerList, error) {
 	var list ServerList
-	if err := decoder.Decode(&list); err != nil {
-		return list, err
+
+	_, err := client.R().
+		SetContext(ctx).
+		SetResult(&list).
+		Get(speedTestServersUrl)
+
+	if err != nil {
+		return ServerList{}, err
 	}
 
 	// Calculate distance

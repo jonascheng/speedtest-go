@@ -34,7 +34,6 @@ func FetchUserInfo(client *resty.Client) (*User, error) {
 func FetchUserInfoContext(ctx context.Context, client *resty.Client) (*User, error) {
 	var users Users
 
-	// Retries are configured per client
 	_, err := client.R().
 		SetContext(ctx).
 		SetResult(&users).

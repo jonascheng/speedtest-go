@@ -1,15 +1,22 @@
 package speedtest
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/go-resty/resty/v2"
+)
 
 func TestFetchServerList(t *testing.T) {
+	// Create a Resty Client
+	client := resty.New()
+
 	user := User{
 		IP:  "111.111.111.111",
 		Lat: "35.22",
 		Lon: "138.44",
 		Isp: "Hello",
 	}
-	serverList, err := FetchServerList(&user)
+	serverList, err := FetchServerList(client, &user)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

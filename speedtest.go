@@ -31,6 +31,7 @@ func main() {
 
 	// Create a Resty Client
 	client := resty.New()
+	// Retries are configured per client
 	client.
 		// Set retry count to non zero to enable retries
 		SetRetryCount(3).
@@ -49,7 +50,7 @@ func main() {
 		showUser(user)
 	}
 
-	serverList, err := speedtest.FetchServerList(user)
+	serverList, err := speedtest.FetchServerList(client, user)
 	checkError(err)
 	if *showList {
 		showServerList(serverList)
