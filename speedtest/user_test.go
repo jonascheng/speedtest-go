@@ -1,6 +1,7 @@
 package speedtest
 
 import (
+	"net"
 	"strconv"
 	"strings"
 	"testing"
@@ -22,36 +23,22 @@ func TestFetchUserInfo(t *testing.T) {
 	client := resty.New()
 
 	user, err := FetchUserInfo(client)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	assert.NoError(t, err, "unexpected error")
 	// IP
-	if len(user.IP) < 7 || len(user.IP) > 15 {
-		t.Errorf("Invalid IP length. got: %v;", user.IP)
-	}
-	if strings.Count(user.IP, ".") != 3 {
-		t.Errorf("Invalid IP format. got: %v", user.IP)
-	}
+	assert.NotNil(t, net.ParseIP(user.IP).To4(), "Invalid IP. got: "+user.IP)
+	assert.Equal(t, 3, strings.Count(user.IP, "."), "Invalid IP format. got: "+user.IP)
 	// Lat
 	lat, err := strconv.ParseFloat(user.Lat, 64)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if lat < -90 || 90 < lat {
-		t.Errorf("Invalid Latitude. got: %v, expected between -90 and 90", user.Lat)
-	}
+	assert.NoError(t, err, "unexpected error")
+	assert.GreaterOrEqual(t, lat, -90.0, "Invalid Latitude. got: "+user.Lat+", expected between -90 and 90")
+	assert.LessOrEqual(t, lat, 90.0, "Invalid Latitude. got: "+user.Lat+", expected between -90 and 90")
 	// Lon
 	lon, err := strconv.ParseFloat(user.Lon, 64)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if lon < -180 || 180 < lon {
-		t.Errorf("Invalid Latitude. got: %v, expected between -90 and 90", user.Lon)
-	}
+	assert.NoError(t, err, "unexpected error")
+	assert.GreaterOrEqual(t, lon, -180.0, "Invalid Longitude. got: "+user.Lon+", expected between -180 and 180")
+	assert.LessOrEqual(t, lon, 180.0, "Invalid Longitude. got: "+user.Lon+", expected between -180 and 180")
 	// Isp
-	if len(user.Isp) == 0 {
-		t.Errorf("Invalid Iso. got: %v;", user.Isp)
-	}
+	assert.Greater(t, len(user.Isp), 0, "Invalid Isp. got: "+user.Isp)
 }
 
 func TestFetchUserInfoWithFakeResponse(t *testing.T) {
@@ -82,10 +69,7 @@ func TestFetchUserInfoWithFakeResponse(t *testing.T) {
 	httpmock.RegisterResponder("GET", speedTestConfigUrl, fakeResponder(200, resp, "application/xml"))
 
 	user, err := FetchUserInfo(client)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-
+	assert.NoError(t, err, "unexpected error")
 	assert.Equal(t, "211.72.129.103", user.IP)
 	assert.Equal(t, "25.0504", user.Lat)
 	assert.Equal(t, "121.5324", user.Lon)
