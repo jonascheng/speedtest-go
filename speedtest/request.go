@@ -14,8 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type downloadWarmUpFunc func(context.Context, string) error
-type downloadFunc func(context.Context, string, int) error
+type downloadFunc func(context.Context, *resty.Client, string, int) error
 type uploadWarmUpFunc func(context.Context, string) error
 type uploadFunc func(context.Context, string, int) error
 
@@ -24,58 +23,54 @@ var ulSizes = [...]int{100, 300, 500, 800, 1000, 1500, 2500, 3000, 3500, 4000} /
 var client = http.Client{}
 
 // DownloadTest executes the test to measure download speed
-func (s *Server) DownloadTest(savingMode bool) error {
-	return s.downloadTestContext(context.Background(), savingMode, dlWarmUp, downloadRequest)
-}
-
-// DownloadTestContext executes the test to measure download speed, observing the given context.
-func (s *Server) DownloadTestContext(ctx context.Context, savingMode bool) error {
-	return s.downloadTestContext(ctx, savingMode, dlWarmUp, downloadRequest)
+func (s *Server) DownloadTest(client *resty.Client) error {
+	return s.downloadTestContext(context.Background(), client, downloadRequest, downloadRequest)
 }
 
 func (s *Server) downloadTestContext(
 	ctx context.Context,
-	savingMode bool,
-	dlWarmUp downloadWarmUpFunc,
+	client *resty.Client,
+	dlWarmUp downloadFunc,
 	downloadRequest downloadFunc,
 ) error {
 	dlURL := strings.Split(s.URL, "/upload.php")[0]
 	eg := errgroup.Group{}
 
 	// Warming up
+	wuWeight := 2
 	sTime := time.Now()
 	for i := 0; i < 2; i++ {
 		eg.Go(func() error {
-			return dlWarmUp(ctx, dlURL)
+			return dlWarmUp(ctx, client, dlURL, wuWeight)
 		})
 	}
 	if err := eg.Wait(); err != nil {
 		return err
 	}
 	fTime := time.Now()
-	// 1.125MB for each request (750 * 750 * 2)
-	wuSpeed := 1.125 * 8 * 2 / fTime.Sub(sTime.Add(s.Latency)).Seconds()
+	// 1.125MB for each request (750 * 750 * 2  / 1000 / 1000)
+	reqMB := float64(dlSizes[wuWeight]) * float64(dlSizes[wuWeight]) * 2.0 / 1000.0 / 1000.0
+	// Calculate speed in Mbps
+	wuSpeed := float64(reqMB) * 8.0 * 2.0 / fTime.Sub(sTime.Add(s.Latency)).Seconds()
 
 	// Decide workload by warm up speed
 	workload := 0
 	weight := 0
 	skip := false
-	if savingMode {
-		workload = 6
-		weight = 3
-	} else if 50.0 < wuSpeed {
+	switch {
+	case wuSpeed > 50.0:
 		workload = 32
 		weight = 6
-	} else if 10.0 < wuSpeed {
+	case wuSpeed > 10.0:
 		workload = 16
 		weight = 4
-	} else if 4.0 < wuSpeed {
+	case wuSpeed > 4.0:
 		workload = 8
 		weight = 4
-	} else if 2.5 < wuSpeed {
+	case wuSpeed > 2.5:
 		workload = 4
 		weight = 4
-	} else {
+	default:
 		skip = true
 	}
 
@@ -85,7 +80,7 @@ func (s *Server) downloadTestContext(
 		sTime = time.Now()
 		for i := 0; i < workload; i++ {
 			eg.Go(func() error {
-				return downloadRequest(ctx, dlURL, weight)
+				return downloadRequest(ctx, client, dlURL, weight)
 			})
 		}
 		if err := eg.Wait(); err != nil {
@@ -93,8 +88,8 @@ func (s *Server) downloadTestContext(
 		}
 		fTime = time.Now()
 
-		reqMB := dlSizes[weight] * dlSizes[weight] * 2 / 1000 / 1000
-		dlSpeed = float64(reqMB) * 8 * float64(workload) / fTime.Sub(sTime).Seconds()
+		reqMB := float64(dlSizes[weight]) * float64(dlSizes[weight]) * 2.0 / 1000.0 / 1000.0
+		dlSpeed = float64(reqMB) * 8 * float64(workload) / fTime.Sub(sTime.Add(s.Latency)).Seconds()
 	}
 
 	s.DLSpeed = dlSpeed
@@ -177,24 +172,6 @@ func (s *Server) uploadTestContext(
 	return nil
 }
 
-func dlWarmUp(ctx context.Context, dlURL string) error {
-	size := dlSizes[2]
-	xdlURL := dlURL + "/random" + strconv.Itoa(size) + "x" + strconv.Itoa(size) + ".jpg"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, xdlURL, nil)
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	_, err = io.Copy(ioutil.Discard, resp.Body)
-	return err
-}
-
 func ulWarmUp(ctx context.Context, ulURL string) error {
 	size := ulSizes[4]
 	v := url.Values{}
@@ -215,21 +192,18 @@ func ulWarmUp(ctx context.Context, ulURL string) error {
 	return err
 }
 
-func downloadRequest(ctx context.Context, dlURL string, w int) error {
+func downloadRequest(ctx context.Context, client *resty.Client, dlURL string, w int) error {
 	size := dlSizes[w]
 	xdlURL := dlURL + "/random" + strconv.Itoa(size) + "x" + strconv.Itoa(size) + ".jpg"
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, xdlURL, nil)
+	_, err := client.R().
+		SetContext(ctx).
+		Get(xdlURL)
+
 	if err != nil {
 		return err
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	_, err = io.Copy(ioutil.Discard, resp.Body)
 	return err
 }
 

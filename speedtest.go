@@ -87,7 +87,7 @@ func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool,
 		checkError(err)
 
 		if jsonOutput {
-			err := s.DownloadTest(savingMode)
+			err := s.DownloadTest(client)
 			checkError(err)
 
 			err = s.UploadTest(savingMode)
@@ -98,7 +98,7 @@ func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool,
 
 		showLatencyResult(s)
 
-		err = testDownload(s, savingMode)
+		err = testDownload(s, client)
 		checkError(err)
 		err = testUpload(s, savingMode)
 		checkError(err)
@@ -111,11 +111,11 @@ func startTest(client *resty.Client, servers speedtest.Servers, savingMode bool,
 	}
 }
 
-func testDownload(server *speedtest.Server, savingMode bool) error {
+func testDownload(server *speedtest.Server, client *resty.Client) error {
 	quit := make(chan bool)
 	fmt.Printf("Download Test: ")
 	go dots(quit)
-	err := server.DownloadTest(savingMode)
+	err := server.DownloadTest(client)
 	quit <- true
 	if err != nil {
 		return err
