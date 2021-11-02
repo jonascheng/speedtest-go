@@ -19,12 +19,9 @@ func TestFetchServerList(t *testing.T) {
 		Isp: "Hello",
 	}
 	serverList, err := FetchServerList(client, &user)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if len(serverList.Servers) == 0 {
-		t.Errorf("Failed to fetch server list.")
-	}
+	assert.NoError(t, err, "unexpected error")
+	assert.Greater(t, len(serverList.Servers), 0, "failed to fetch server list.")
+	assert.Greater(t, len(serverList.Servers[0].Country), 0, "got unexpected country name "+serverList.Servers[0].Country)
 	if len(serverList.Servers[0].Country) == 0 {
 		t.Errorf("got unexpected country name '%v'", serverList.Servers[0].Country)
 	}
@@ -55,14 +52,17 @@ func TestFetchServerListWithFakeResponse(t *testing.T) {
 		Country: "US",
 	}
 	serverList, err := FetchServerList(client, &user)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if len(serverList.Servers) == 0 {
-		t.Errorf("Failed to fetch server list.")
-	}
+	assert.NoError(t, err, "unexpected error")
+	assert.Greater(t, len(serverList.Servers), 0, "failed to fetch server list.")
+	assert.Equal(t, "http://fake.com:8080/speedtest/upload.php", serverList.Servers[0].URL)
+	assert.Equal(t, "新北", serverList.Servers[0].Name)
+	assert.Equal(t, "Taiwan", serverList.Servers[0].Country)
+	assert.Equal(t, "大新店", serverList.Servers[0].Sponsor)
+	assert.Equal(t, "14652", serverList.Servers[0].ID)
+	assert.Equal(t, "fake.com:8080", serverList.Servers[0].Host)
 	d := distance(35.22, 138.44, 35.22, 138.44)
-	assert.Equal(t, d, serverList.Servers[0].Distance)
+	assert.Equal(t, d, serverList.Servers[0].Distance, "the distance should be the same")
+
 }
 
 func TestDistance(t *testing.T) {
