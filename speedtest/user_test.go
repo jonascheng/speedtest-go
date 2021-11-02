@@ -10,6 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func fakeResponder(s int, c string, ct string) httpmock.Responder {
+	resp := httpmock.NewStringResponse(s, c)
+	resp.Header.Set("Content-Type", ct)
+
+	return httpmock.ResponderFromResponse(resp)
+}
+
 func TestFetchUserInfo(t *testing.T) {
 	// Create a Resty Client
 	client := resty.New()
@@ -47,13 +54,6 @@ func TestFetchUserInfo(t *testing.T) {
 	}
 }
 
-func fakeResponder(s int, c string, ct string) httpmock.Responder {
-	resp := httpmock.NewStringResponse(s, c)
-	resp.Header.Set("Content-Type", ct)
-
-	return httpmock.ResponderFromResponse(resp)
-}
-
 func TestFetchUserInfoWithFakeResponse(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
@@ -79,7 +79,7 @@ func TestFetchUserInfoWithFakeResponse(t *testing.T) {
 
 	httpmock.Activate()
 	httpmock.ActivateNonDefault(client.GetClient())
-	httpmock.RegisterResponder("GET", "https://www.speedtest.net/speedtest-config.php", fakeResponder(200, resp, "application/xml"))
+	httpmock.RegisterResponder("GET", speedTestConfigUrl, fakeResponder(200, resp, "application/xml"))
 
 	user, err := FetchUserInfo(client)
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchServerList(t *testing.T) {
@@ -26,6 +28,41 @@ func TestFetchServerList(t *testing.T) {
 	if len(serverList.Servers[0].Country) == 0 {
 		t.Errorf("got unexpected country name '%v'", serverList.Servers[0].Country)
 	}
+}
+
+func TestFetchServerListWithFakeResponse(t *testing.T) {
+	defer httpmock.DeactivateAndReset()
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `<settings>
+	<servers>
+	<server url="http://fake.com:8080/speedtest/upload.php" lat="35.22" lon="138.44" name="新北" country="Taiwan" cc="TW" sponsor="大新店" id="14652" host="fake.com:8080"/>
+	</servers>
+	</settings>`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", speedTestServersUrl, fakeResponder(200, resp, "application/xml"))
+
+	user := User{
+		IP:      "111.111.111.111",
+		Lat:     "35.22",
+		Lon:     "138.44",
+		Isp:     "Hello",
+		Country: "US",
+	}
+	serverList, err := FetchServerList(client, &user)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if len(serverList.Servers) == 0 {
+		t.Errorf("Failed to fetch server list.")
+	}
+	d := distance(35.22, 138.44, 35.22, 138.44)
+	assert.Equal(t, d, serverList.Servers[0].Distance)
 }
 
 func TestDistance(t *testing.T) {
