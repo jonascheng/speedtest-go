@@ -4,7 +4,14 @@ APPLICATION?=speedtest-go
 COMMIT_SHA?=$(shell git rev-parse --short HEAD)
 DOCKER?=docker
 REGISTRY?=jonascheng
+# is Windows_NT on XP, 2000, 7, Vista, 10...
+ifeq ($(OS),Windows_NT)
+GOOS?=windows
+RACE=""
+else
 GOOS?=$(shell uname -s | awk '{print tolower($0)}')
+GORACE="-race"
+endif
 
 .PHONY: setup
 setup: ## setup go modules
@@ -17,15 +24,15 @@ clean: ## cleans the binary
 
 .PHONY: run
 run: setup ## runs go run the application
-	go run -race speedtest.go
+	go run ${GORACE} speedtest.go
 
 .PHONY: test
 test: ## runs go test the application
-	go test -race -v ./... -covermode=atomic -coverprofile=coverage.out
+	go test ${GORACE} -v ./... -covermode=atomic -coverprofile=coverage.out
 
 .PHONY: build
 build: clean ## build the application
-	GOOS=${GOOS} GOARCH=amd64 go build -race -a -v -ldflags="-w -s" -o bin/${APPLICATION} speedtest.go
+	GOOS=${GOOS} GOARCH=amd64 go build ${GORACE} -a -v -ldflags="-w -s" -o bin/${APPLICATION} speedtest.go
 
 .PHONY: docker-login
 docker-login: ## login docker registry
