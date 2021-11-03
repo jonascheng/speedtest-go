@@ -80,6 +80,32 @@ func TestDownloadTestContext(t *testing.T) {
 	assert.LessOrEqual(t, server.DLSpeed, 6600.0, "got unexpected server.DLSpeed '%v', expected between 6300 and 6600", server.DLSpeed)
 }
 
+func TestDownloadTestContextWithStatus404(t *testing.T) {
+	latency, _ := time.ParseDuration("10ms")
+	server := Server{
+		URL:     "http://fake.com/upload.php",
+		Latency: latency,
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `fake-image`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", "http://fake.com/random750x750.jpg", fakeResponder(404, resp, "image/jpeg"))
+
+	err := server.downloadTestContext(
+		context.Background(),
+		client,
+		downloadRequest,
+		downloadRequest,
+	)
+	assert.Error(t, err, "should expect error")
+}
+
 func TestUploadTestContext(t *testing.T) {
 	latency, _ := time.ParseDuration("5ms")
 	server := Server{
@@ -99,6 +125,32 @@ func TestUploadTestContext(t *testing.T) {
 	assert.NoError(t, err, "unexpected error %v", err)
 	assert.GreaterOrEqual(t, server.ULSpeed, 2400.0, "got unexpected server.ULSpeed '%v', expected between 2400 and 2600", server.ULSpeed)
 	assert.LessOrEqual(t, server.ULSpeed, 2600.0, "got unexpected server.ULSpeed '%v', expected between 2400 and 2600", server.ULSpeed)
+}
+
+func TestUploadTestContextWithStatus404(t *testing.T) {
+	latency, _ := time.ParseDuration("5ms")
+	server := Server{
+		URL:     "http://fake.com/upload.php",
+		Latency: latency,
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `fake-response`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("Post", "http://fake.com/upload.php", fakeResponder(404, resp, "image/jpeg"))
+
+	err := server.uploadTestContext(
+		context.Background(),
+		client,
+		uploadRequest,
+		uploadRequest,
+	)
+	assert.Error(t, err, "should expect error")
 }
 
 func mockWarmUp(ctx context.Context, client *resty.Client, dlURL string, w int) error {
