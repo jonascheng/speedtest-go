@@ -90,6 +90,30 @@ Download Avg: 120.04 Mbit/s
 Upload Avg: 114.88 Mbit/s
 ```
 
+### Test to local hosted ookla Server
+
+#### Start local Server
+
+```bash
+$ docker-compose up -d
+```
+
+#### Test to local Speed
+
+```bash
+$ ./bin/speedtest-go --server http://localhost:8080/upload.php
+
+Target Server: [    ]     0.00km
+	> User specified (User specified) by User specified
+	> http://localhost:8081/upload.php
+
+Download Test: ................
+Upload Test: ................
+Latency: 875.792µs
+Download: 391.33 Mbit/s
+Upload: 250.19 Mbit/s
+```
+
 ## Go API
 
 ```
@@ -129,48 +153,6 @@ func main() {
 		fmt.Printf("Latency: %s, Download: %f, Upload: %f\n", s.Latency, s.DLSpeed, s.ULSpeed)
 	}
 }
-```
-
-## Network Bandwidth Emulator
-
-With a local hosted ookla to simulate different network latency.
-
-### Start emulator
-
-```bash
-$ docker-compose up -d
-```
-
-### Test Normal Speed
-
-```bash
-$ ./bin/speedtest-go --server http://localhost:8081/upload.php
-
-Target Server: [    ]     0.00km
-	> User specified (User specified) by User specified
-	> http://localhost:8081/upload.php
-
-Download Test: ................
-Upload Test: ................
-Latency: 875.792µs
-Download: 391.33 Mbit/s
-Upload: 250.19 Mbit/s
-```
-
-### Test Throttle Speed
-
-```bash
-$ ./bin/speedtest-go --server http://localhost:8080/upload.php
-
-Target Server: [    ]     0.00km
-	> User specified (User specified) by User specified
-	> http://localhost:8080/upload.php
-Latency: 128.924542ms
-Download Test: ................
-Upload Test: ................
-
-Download: 34.96 Mbit/s
-Upload: 272.76 Mbit/s
 ```
 
 ## LICENSE
