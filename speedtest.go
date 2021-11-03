@@ -42,9 +42,7 @@ func main() {
 		SetRetryMaxWaitTime(20 * time.Second)
 
 	user, err := speedtest.FetchUserInfo(client)
-	if err != nil {
-		fmt.Println("Warning: Cannot fetch user information. http://www.speedtest.net/speedtest-config.php is temporarily unavailable.")
-	}
+	checkError(err)
 	if !*jsonOutput {
 		showUser(user)
 	}

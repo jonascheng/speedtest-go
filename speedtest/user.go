@@ -2,7 +2,6 @@ package speedtest
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
@@ -34,7 +33,7 @@ func FetchUserInfo(client *resty.Client) (*User, error) {
 func FetchUserInfoContext(ctx context.Context, client *resty.Client) (*User, error) {
 	var users Users
 
-	_, err := client.R().
+	resp, err := client.R().
 		SetContext(ctx).
 		SetResult(&users).
 		Get(speedTestConfigUrl)
@@ -43,8 +42,12 @@ func FetchUserInfoContext(ctx context.Context, client *resty.Client) (*User, err
 		return nil, err
 	}
 
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("unexpected status code %v while fetching user information from %v", resp.StatusCode(), speedTestConfigUrl)
+	}
+
 	if len(users.Users) == 0 {
-		return nil, errors.New("failed to fetch user information")
+		return nil, fmt.Errorf("failed to fetch user information from %v", speedTestConfigUrl)
 	}
 
 	// Only return the first item
