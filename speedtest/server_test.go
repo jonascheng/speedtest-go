@@ -83,7 +83,37 @@ func TestFetchServerListWithEmptyResponse(t *testing.T) {
 	}
 	serverList, err := FetchServerList(client, &user)
 	assert.Error(t, err, "should expect error")
-	assert.Equal(t, "unable to retrieve server list", err.Error(), "unexpected error %v", err)
+	assert.Equal(t, "unable to retrieve server list from https://www2.speedtest.net/speedtest-servers-static.php", err.Error(), "unexpected error %v", err)
+	assert.Equal(t, ServerList{}, serverList)
+}
+
+func TestFetchServerListWithStatus404(t *testing.T) {
+	defer httpmock.DeactivateAndReset()
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `<settings>
+	<servers>
+	<server url="http://fake.com:8080/speedtest/upload.php" lat="35.22" lon="138.44" name="新北" country="Taiwan" cc="TW" sponsor="大新店" id="14652" host="fake.com:8080"/>
+	</servers>
+	</settings>`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", speedTestServersUrl, fakeResponder(404, resp, "application/xml"))
+
+	user := User{
+		IP:      "111.111.111.111",
+		Lat:     "35.22",
+		Lon:     "138.44",
+		Isp:     "Hello",
+		Country: "US",
+	}
+	serverList, err := FetchServerList(client, &user)
+	assert.Error(t, err, "should expect error")
+	assert.Equal(t, "unexpected status code 404 while retrieving server list from https://www2.speedtest.net/speedtest-servers-static.php", err.Error(), "unexpected error %v", err)
 	assert.Equal(t, ServerList{}, serverList)
 }
 

@@ -68,13 +68,17 @@ func FetchServerList(client *resty.Client, user *User) (ServerList, error) {
 func FetchServerListContext(ctx context.Context, client *resty.Client, user *User) (ServerList, error) {
 	list := ServerList{}
 
-	_, err := client.R().
+	resp, err := client.R().
 		SetContext(ctx).
 		SetResult(&list).
 		Get(speedTestServersUrl)
 
 	if err != nil {
 		return list, err
+	}
+
+	if resp.StatusCode() != 200 {
+		return list, fmt.Errorf("unexpected status code %v while retrieving server list from %v", resp.StatusCode(), speedTestServersUrl)
 	}
 
 	// Calculate distance
@@ -91,7 +95,7 @@ func FetchServerListContext(ctx context.Context, client *resty.Client, user *Use
 	sort.Sort(ByDistance{list.Servers})
 
 	if len(list.Servers) <= 0 {
-		return list, errors.New("unable to retrieve server list")
+		return list, fmt.Errorf("unable to retrieve server list from %v", speedTestServersUrl)
 	}
 
 	return list, nil
