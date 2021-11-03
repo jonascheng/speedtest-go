@@ -18,7 +18,6 @@ Flags:
       --help               Show context-sensitive help (also try --help-long and --help-man).
   -l, --list               Show available speedtest.net servers.
   -s, --server=SERVER ...  Select server id to speedtest.
-      --saving-mode        Using less memory (≒10MB), though low accuracy (especially > 30Mbps).
       --json               Output results as json
       --version            Show application version.
 ```
@@ -98,24 +97,33 @@ go get github.com/jonascheng/speedtest-go
 
 ### API Usage
 The code below finds closest available speedtest server and tests the latency, download, and upload speeds.
+
 ```go
 package main
 
 import (
 	"fmt"
+	"github.com/go-resty/resty/v2"
 	"github.com/jonascheng/speedtest-go/speedtest"
 )
 
 func main() {
-	user, _ := speedtest.FetchUserInfo()
+	// Create a Resty Client
+	client := resty.New()
 
-	serverList, _ := speedtest.FetchServerList(user)
+	user, _ := speedtest.FetchUserInfo(client)
+
+	serverList, _ := speedtest.FetchServerList(client, user)
+
 	targets, _ := serverList.FindServer([]int{})
 
 	for _, s := range targets {
-		s.PingTest()
-		s.DownloadTest(false)
-		s.UploadTest(false)
+		// This is required to determin network latency.
+		s.PingTest(client)
+		// These two bandwidth tests can be used base upon use cases.
+		// If use case requires only upload bandwidth, and then just invoke UploadTest to obtain ULSpeed.
+		s.DownloadTest(client)
+		s.UploadTest(client)
 
 		fmt.Printf("Latency: %s, Download: %f, Upload: %f\n", s.Latency, s.DLSpeed, s.ULSpeed)
 	}
