@@ -3,28 +3,29 @@
 ![codecov](https://codecov.io/gh/jonascheng/speedtest-go/branch/main/graph/badge.svg)
 
 # speedtest-go
-**Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)**
-You can speedtest 2x faster than [speedtest.net](http://www.speedtest.net/) with almost the same result.
+
+Command Line Interface and pure Go API to Test Internet Speed using [speedtest.net](http://www.speedtest.net/)
 
 Inspired by [sivel/speedtest-cli](https://github.com/sivel/speedtest-cli)
 
-### Usage
+## Usage
 
 ```bash
 $ speedtest --help
 usage: speedtest-go [<flags>]
 
 Flags:
-      --help               Show context-sensitive help (also try --help-long and --help-man).
-  -l, --list               Show available speedtest.net servers.
-  -s, --server=SERVER ...  Select server id to speedtest.
-      --json               Output results as json
-      --version            Show application version.
+      --help           Show context-sensitive help (also try --help-long and --help-man).
+  -l, --list           Show available speedtest.net servers.
+  -i, --id=ID ...      Select server id to speedtest, which id(s) is obtained by option 'list'.
+  -s, --server=SERVER  Specify server to speedtest, ex: http://your.speedtest:8080/upload.php
+      --json           Output results in json format
+      --version        Show application version.
 ```
 
-#### Test Internet Speed
+### Test Internet Speed
 
-Simply use `speedtest` command. The closest server is selected by default.
+Simply use `./bin/speedtest-go` command. The closest server is selected by default.
 
 ```bash
 $ ./bin/speedtest-go
@@ -41,7 +42,7 @@ Download: 73.30 Mbit/s
 Upload: 35.26 Mbit/s
 ```
 
-#### Test to Other Servers
+### Test to Other Servers
 
 If you want to select other server to test, you can see available server list.
 
@@ -62,7 +63,7 @@ Testing From IP: 211.72.129.103, (Chunghwa Telecom) (TW) [25.0504, 121.5324]
 and select them by id.
 
 ```bash
-$ ./bin/speedtest-go --server 18445 --server 24461
+$ ./bin/speedtest-go --id 18445 --id 24461
 Testing From IP: 211.72.129.103, (Chunghwa Telecom) (TW) [25.0504, 121.5324]
 
 Target Server: [18445]     1.91km
@@ -128,6 +129,48 @@ func main() {
 		fmt.Printf("Latency: %s, Download: %f, Upload: %f\n", s.Latency, s.DLSpeed, s.ULSpeed)
 	}
 }
+```
+
+## Network Bandwidth Emulator
+
+With a local hosted ookla to simulate different network latency.
+
+### Start emulator
+
+```bash
+$ docker-compose up -d
+```
+
+### Test Normal Speed
+
+```bash
+$ ./bin/speedtest-go --server http://localhost:8081/upload.php
+
+Target Server: [    ]     0.00km
+	> User specified (User specified) by User specified
+	> http://localhost:8081/upload.php
+
+Download Test: ................
+Upload Test: ................
+Latency: 875.792µs
+Download: 391.33 Mbit/s
+Upload: 250.19 Mbit/s
+```
+
+### Test Throttle Speed
+
+```bash
+$ ./bin/speedtest-go --server http://localhost:8080/upload.php
+
+Target Server: [    ]     0.00km
+	> User specified (User specified) by User specified
+	> http://localhost:8080/upload.php
+Latency: 128.924542ms
+Download Test: ................
+Upload Test: ................
+
+Download: 34.96 Mbit/s
+Upload: 272.76 Mbit/s
 ```
 
 ## LICENSE
