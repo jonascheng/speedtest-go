@@ -15,7 +15,7 @@ import (
 
 var (
 	showList   = kingpin.Flag("list", "Show available speedtest.net servers.").Short('l').Bool()
-	serverIds  = kingpin.Flag("server", "Select server id to speedtest.").Short('s').Ints()
+	serverIds  = kingpin.Flag("server", "Select server id to speedtest, which id(s) is obtained by option 'list'.").Short('s').Ints()
 	jsonOutput = kingpin.Flag("json", "Output results in json format").Bool()
 )
 
