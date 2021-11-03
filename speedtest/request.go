@@ -2,6 +2,7 @@ package speedtest
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -167,12 +168,16 @@ func downloadRequest(ctx context.Context, client *resty.Client, dlURL string, w 
 	size := dlSizes[w]
 	xdlURL := dlURL + "/random" + strconv.Itoa(size) + "x" + strconv.Itoa(size) + ".jpg"
 
-	_, err := client.R().
+	resp, err := client.R().
 		SetContext(ctx).
 		Get(xdlURL)
 
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("unexpected status code %v while downloading from %v", resp.StatusCode(), xdlURL)
 	}
 
 	return err
@@ -183,7 +188,7 @@ func uploadRequest(ctx context.Context, client *resty.Client, ulURL string, w in
 	v := url.Values{}
 	v.Add("content", strings.Repeat("0123456789", size*100-51))
 
-	_, err := client.R().
+	resp, err := client.R().
 		SetContext(ctx).
 		SetBody(v.Encode()).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
@@ -193,28 +198,36 @@ func uploadRequest(ctx context.Context, client *resty.Client, ulURL string, w in
 		return err
 	}
 
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("unexpected status code %v while uploading to %v", resp.StatusCode(), ulURL)
+	}
+
 	return err
 }
 
 // PingTest executes test to measure latency
 func (s *Server) PingTest(client *resty.Client) error {
-	return s.PingTestContext(context.Background(), client)
+	return s.pingTestContext(context.Background(), client)
 }
 
-// PingTestContext executes test to measure latency, observing the given context.
-func (s *Server) PingTestContext(ctx context.Context, client *resty.Client) error {
+// pingTestContext executes test to measure latency, observing the given context.
+func (s *Server) pingTestContext(ctx context.Context, client *resty.Client) error {
 	pingURL := strings.Split(s.URL, "/upload.php")[0] + "/latency.txt"
 
-	l := time.Duration(100000000000) // 10sec
+	l := time.Duration(10000000000) // 10sec
 	for i := 0; i < 3; i++ {
 		sTime := time.Now()
 
-		_, err := client.R().
+		resp, err := client.R().
 			SetContext(ctx).
 			Get(pingURL)
 
 		if err != nil {
 			return err
+		}
+
+		if resp.StatusCode() != 200 {
+			return fmt.Errorf("unexpected status code %v while pinging %v", resp.StatusCode(), pingURL)
 		}
 
 		fTime := time.Now()

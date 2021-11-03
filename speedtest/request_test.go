@@ -7,8 +7,57 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestPingTestContext(t *testing.T) {
+	latency, _ := time.ParseDuration("1s")
+	server := Server{
+		URL:     "http://fake.com/upload.php",
+		Latency: latency,
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `test=test`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", "http://fake.com/latency.txt", fakeResponder(200, resp, "text/plain"))
+
+	err := server.pingTestContext(
+		context.Background(),
+		client,
+	)
+	assert.NoError(t, err, "unexpected error %v", err)
+	assert.Less(t, server.Latency.Milliseconds(), latency.Milliseconds(), "got unexpected server.Latency '%v', expected greater than 0", server.Latency)
+}
+
+func TestPingTestContextWithStatus404(t *testing.T) {
+	server := Server{
+		URL: "http://fake.com/upload.php",
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+
+	// fake response
+	resp := `test=test`
+
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(client.GetClient())
+	httpmock.RegisterResponder("GET", "http://fake.com/latency.txt", fakeResponder(404, resp, "text/plain"))
+
+	err := server.pingTestContext(
+		context.Background(),
+		client,
+	)
+	assert.Error(t, err, "should expect error")
+	assert.Equal(t, "unexpected status code 404 while pinging http://fake.com/latency.txt", err.Error(), "unexpected error %v", err)
+}
 
 func TestDownloadTestContext(t *testing.T) {
 	latency, _ := time.ParseDuration("10ms")
