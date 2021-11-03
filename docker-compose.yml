@@ -5,7 +5,7 @@ services:
 
   ookla:
     build:
-      context: ./ookla/ookla-for-docker
+      context: ./ookla/
       dockerfile: Dockerfile
     image: local/ookla
     container_name: ookla
