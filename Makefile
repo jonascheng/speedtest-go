@@ -21,11 +21,11 @@ run: setup ## runs go run the application
 
 .PHONY: test
 test: ## runs go test the application
-	go test -v ./... -covermode=atomic -coverprofile=coverage.out
+	go test -race -v ./... -covermode=atomic -coverprofile=coverage.out
 
 .PHONY: build
 build: clean ## build the application
-	GOOS=${GOOS} GOARCH=amd64 go build -a -v -ldflags="-w -s" -o bin/${APPLICATION} speedtest.go
+	GOOS=${GOOS} GOARCH=amd64 go build -race -a -v -ldflags="-w -s" -o bin/${APPLICATION} speedtest.go
 
 .PHONY: docker-login
 docker-login: ## login docker registry
