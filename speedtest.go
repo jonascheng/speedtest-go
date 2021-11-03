@@ -15,7 +15,8 @@ import (
 
 var (
 	showList   = kingpin.Flag("list", "Show available speedtest.net servers.").Short('l').Bool()
-	serverIds  = kingpin.Flag("server", "Select server id to speedtest, which id(s) is obtained by option 'list'.").Short('s').Ints()
+	serverIds  = kingpin.Flag("id", "Select server id to speedtest, which id(s) is obtained by option 'list'.").Short('i').Ints()
+	server     = kingpin.Flag("server", "Specify server to speedtest, ex: http://your.speedtest:8080/upload.php").Short('s').String()
 	jsonOutput = kingpin.Flag("json", "Output results in json format").Bool()
 )
 
@@ -41,21 +42,28 @@ func main() {
 		// Default is 2 seconds.
 		SetRetryMaxWaitTime(20 * time.Second)
 
-	user, err := speedtest.FetchUserInfo(client)
-	checkError(err)
-	if !*jsonOutput {
-		showUser(user)
-	}
+	var user *speedtest.User
+	var targets speedtest.Servers
+	if *server != "" {
+		s := speedtest.NewServer(*server)
+		targets = speedtest.Servers{&s}
+	} else {
+		user, err := speedtest.FetchUserInfo(client)
+		checkError(err)
+		if !*jsonOutput {
+			showUser(user)
+		}
 
-	serverList, err := speedtest.FetchServerList(client, user)
-	checkError(err)
-	if *showList {
-		showServerList(serverList)
-		return
-	}
+		serverList, err := speedtest.FetchServerList(client, user)
+		checkError(err)
+		if *showList {
+			showServerList(serverList)
+			return
+		}
 
-	targets, err := serverList.FindServer(*serverIds)
-	checkError(err)
+		targets, err = serverList.FindServer(*serverIds)
+		checkError(err)
+	}
 
 	startTest(client, targets, *jsonOutput)
 
@@ -114,9 +122,7 @@ func testDownload(server *speedtest.Server, client *resty.Client) error {
 	go dots(quit)
 	err := server.DownloadTest(client)
 	quit <- true
-	if err != nil {
-		return err
-	}
+	checkError(err)
 	fmt.Println()
 	return err
 }
@@ -127,9 +133,7 @@ func testUpload(server *speedtest.Server, client *resty.Client) error {
 	go dots(quit)
 	err := server.UploadTest(client)
 	quit <- true
-	if err != nil {
-		return err
-	}
+	checkError(err)
 	fmt.Println()
 	return nil
 }

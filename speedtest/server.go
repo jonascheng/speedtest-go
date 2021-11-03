@@ -138,6 +138,17 @@ func (l *ServerList) FindServer(serverID []int) (Servers, error) {
 	return servers, nil
 }
 
+// Return server
+func NewServer(server string) Server {
+	return Server{
+		URL:     server,
+		Name:    "User specified",
+		Country: "User specified",
+		Sponsor: "User specified",
+		Host:    server,
+	}
+}
+
 // String representation of ServerList
 func (l *ServerList) String() string {
 	slr := ""
