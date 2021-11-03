@@ -167,3 +167,9 @@ func TestFindServer(t *testing.T) {
 	assert.Equal(t, "3", s[0].ID, "unexpected server ID. got: %v, expected: '3'", s[0].ID)
 	assert.Equal(t, "1", s[1].ID, "unexpected server ID. got: %v, expected: '1'", s[1].ID)
 }
+
+func TestNewServer(t *testing.T) {
+	server := NewServer("http://fake.com:8080/speedtest/upload.php")
+	assert.Equal(t, "http://fake.com:8080/speedtest/upload.php", server.URL)
+	assert.Equal(t, "http://fake.com:8080/speedtest/upload.php", server.Host)
+}
